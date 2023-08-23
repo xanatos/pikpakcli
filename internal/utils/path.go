@@ -22,7 +22,7 @@ func Slash(path string) string {
 	if path == "" {
 		return ""
 	}
-	if path[0] == '/' {
+	if path[0] == filepath.Separator {
 		return path[1:]
 	}
 	return path
