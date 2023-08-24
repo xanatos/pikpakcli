@@ -74,9 +74,9 @@ func init() {
 func handleNewUrl(p *pikpak.PikPak, shas []string) {
 	var err error
 	if parentId == "" {
-		parentId, err = p.GetPathFolderId(path)
+		parentId, err = p.GetDeepFolderOrCreateId("", path)
 		if err != nil {
-			logrus.Errorf("Get parent id failed: %s\n", err)
+			logrus.Errorf("Get folder %s id failed: %s\n", path, err)
 			return
 		}
 	}
