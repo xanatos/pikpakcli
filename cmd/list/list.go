@@ -2,6 +2,7 @@ package list
 
 import (
 	"fmt"
+	"path/filepath"
 	"strconv"
 
 	"github.com/52funny/pikpakcli/conf"
@@ -12,6 +13,7 @@ import (
 )
 
 var long bool
+var recursive bool
 var human bool
 var path string
 var parentId string
@@ -32,11 +34,22 @@ var ListCmd = &cobra.Command{
 func init() {
 	ListCmd.Flags().BoolVarP(&human, "human", "H", false, "display human readable format")
 	ListCmd.Flags().BoolVarP(&long, "long", "l", false, "display long format")
+	ListCmd.Flags().BoolVarP(&recursive, "recursive", "R", false, "display recursively")
 	ListCmd.Flags().StringVarP(&path, "path", "p", "/", "display the specified path")
 	ListCmd.Flags().StringVarP(&parentId, "parent-id", "P", "", "display the specified parent id")
 }
 
 func handle(p *pikpak.PikPak, args []string) {
+	var currentPath string = ""
+
+	if recursive && parentId == "" {
+		currentPath = filepath.Clean(path)
+
+		if currentPath != string(filepath.Separator) {
+			currentPath = currentPath + string(filepath.Separator)
+		}
+	}
+
 	var err error
 	if parentId == "" {
 		parentId, err = p.GetPathFolderId(path)
@@ -45,20 +58,31 @@ func handle(p *pikpak.PikPak, args []string) {
 			return
 		}
 	}
+
+	listFolder(p, parentId, currentPath)
+}
+
+func listFolder(p *pikpak.PikPak, parentId string, currentPath string) {
 	files, err := p.GetFolderFileStatList(parentId)
 	if err != nil {
 		logrus.Errorln("get folder file stat list error:", err)
 		return
 	}
+
 	for _, file := range files {
 		if long {
 			if human {
-				display(3, &file)
+				display(3, currentPath, &file)
 			} else {
-				display(2, &file)
+				display(2, currentPath, &file)
 			}
 		} else {
-			display(0, &file)
+			display(0, currentPath, &file)
+		}
+
+		if recursive && file.Kind == "drive#folder" {
+			var currentPath2 string = currentPath + file.Name + string(filepath.Separator)
+			listFolder(p, file.ID, currentPath2)
 		}
 	}
 }
@@ -68,25 +92,27 @@ func handle(p *pikpak.PikPak, args []string) {
 // mode 2: long format
 // mode 3: long format and human readable
 
-func display(mode int, file *pikpak.FileStat) {
+func display(mode int, currentPath string, file *pikpak.FileStat) {
+	var fileName = currentPath + file.Name
+
 	switch mode {
 	case 0:
 		if file.Kind == "drive#folder" {
-			fmt.Printf("%-20s\n", color.GreenString(file.Name))
+			fmt.Printf("%-20s\n", color.GreenString(fileName))
 		} else {
-			fmt.Printf("%-20s\n", file.Name)
+			fmt.Printf("%-20s\n", fileName)
 		}
 	case 2:
 		if file.Kind == "drive#folder" {
-			fmt.Printf("%-26s %-6s %-14s %s\n", file.ID, file.Size, file.CreatedTime.Format("2006-01-02 15:04:05"), color.GreenString(file.Name))
+			fmt.Printf("%-26s d %-6s %-14s %s\n", file.ID, file.Size, file.CreatedTime.Format("2006-01-02 15:04:05"), color.GreenString(fileName))
 		} else {
-			fmt.Printf("%-26s %-6s %-14s %s\n", file.ID, file.Size, file.CreatedTime.Format("2006-01-02 15:04:05"), file.Name)
+			fmt.Printf("%-26s f %-6s %-14s %s\n", file.ID, file.Size, file.CreatedTime.Format("2006-01-02 15:04:05"), fileName)
 		}
 	case 3:
 		if file.Kind == "drive#folder" {
-			fmt.Printf("%-26s %-6s %-14s %s\n", file.ID, displayStorage(file.Size), file.CreatedTime.Format("2006-01-02 15:04:05"), color.GreenString(file.Name))
+			fmt.Printf("%-26s d %-6s %-14s %s\n", file.ID, displayStorage(file.Size), file.CreatedTime.Format("2006-01-02 15:04:05"), color.GreenString(fileName))
 		} else {
-			fmt.Printf("%-26s %-6s %-14s %s\n", file.ID, displayStorage(file.Size), file.CreatedTime.Format("2006-01-02 15:04:05"), file.Name)
+			fmt.Printf("%-26s f %-6s %-14s %s\n", file.ID, displayStorage(file.Size), file.CreatedTime.Format("2006-01-02 15:04:05"), fileName)
 		}
 	}
 }
