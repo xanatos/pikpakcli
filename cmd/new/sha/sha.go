@@ -25,7 +25,7 @@ var NewShaCommand = &cobra.Command{
 		if strings.TrimSpace(input) != "" {
 			f, err := os.OpenFile(input, os.O_RDONLY, 0666)
 			if err != nil {
-				logrus.Errorln("Open file %s failed:", input, err)
+				logrus.Errorf("Open file %s failed: %s", input, err)
 				return
 			}
 			reader := bufio.NewReader(f)
@@ -68,7 +68,7 @@ func handleNewSha(p *pikpak.PikPak, shas []string) {
 	if parentId == "" {
 		parentId, err = p.GetDeepFolderOrCreateId("", path)
 		if err != nil {
-			logrus.Errorf("Get folder %s id failed: %s\n", path, err)
+			logrus.Errorf("Get folder %s id failed: %s", path, err)
 			return
 		}
 	}
@@ -77,15 +77,15 @@ func handleNewSha(p *pikpak.PikPak, shas []string) {
 		sha = sha[strings.Index(sha, "://")+3:]
 		shaElements := strings.Split(sha, "|")
 		if len(shaElements) != 3 {
-			logrus.Errorln("The sha format is wrong: ", sha)
+			logrus.Errorln("The sha format is wrong:", sha)
 			continue
 		}
 		name, size, sha := shaElements[0], shaElements[1], shaElements[2]
 		err := p.CreateShaFile(parentId, name, size, sha)
 		if err != nil {
-			logrus.Errorln("Create sha file failed: ", err)
+			logrus.Errorln("Create sha file failed:", err)
 			continue
 		}
-		logrus.Infoln("Create sha file success: ", name)
+		logrus.Infoln("Create sha file success:", name)
 	}
 }

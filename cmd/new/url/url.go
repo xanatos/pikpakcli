@@ -30,7 +30,7 @@ var NewUrlCommand = &cobra.Command{
 		if strings.TrimSpace(input) != "" {
 			f, err := os.OpenFile(input, os.O_RDONLY, 0666)
 			if err != nil {
-				logrus.Errorln("Open file %s failed:", input, err)
+				logrus.Errorf("Open file %s failed: %s", input, err)
 				return
 			}
 			reader := bufio.NewReader(f)
@@ -76,17 +76,17 @@ func handleNewUrl(p *pikpak.PikPak, shas []string) {
 	if parentId == "" {
 		parentId, err = p.GetDeepFolderOrCreateId("", path)
 		if err != nil {
-			logrus.Errorf("Get folder %s id failed: %s\n", path, err)
+			logrus.Errorf("Get folder %s id failed: %s", path, err)
 			return
 		}
 	}
 	for _, url := range shas {
 		err := p.CreateUrlFile(parentId, url)
 		if err != nil {
-			logrus.Errorln("Create url file failed: ", err)
+			logrus.Errorln("Create url file failed:", err)
 			continue
 		}
-		logrus.Infoln("Create url file success: ", url)
+		logrus.Infoln("Create url file success:", url)
 	}
 }
 
@@ -95,7 +95,7 @@ func handleCli(p *pikpak.PikPak) {
 	if parentId == "" {
 		parentId, err = p.GetPathFolderId(path)
 		if err != nil {
-			logrus.Errorf("Get parent id failed: %s\n", err)
+			logrus.Errorf("Get parent id failed: %s", err)
 			return
 		}
 	}
@@ -110,9 +110,9 @@ func handleCli(p *pikpak.PikPak) {
 		url := string(lineBytes)
 		err = p.CreateUrlFile(parentId, url)
 		if err != nil {
-			logrus.Errorln("Create url file failed: ", err)
+			logrus.Errorln("Create url file failed:", err)
 			continue
 		}
-		logrus.Infoln("Create url file success: ", url)
+		logrus.Infoln("Create url file success:", url)
 	}
 }

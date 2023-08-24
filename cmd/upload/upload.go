@@ -104,10 +104,10 @@ func handleUploadFile(p *pikpak.PikPak, path string) {
 	}
 	err = p.UploadFile(parentId, path)
 	if err != nil {
-		logrus.Errorf("Upload file %s failed: %s\n", path, err)
+		logrus.Errorf("Upload file %s failed: %s", path, err)
 		return
 	}
-	logrus.Infof("Upload file %s success!\n", path)
+	logrus.Infof("Upload file %s success!", path)
 }
 
 // upload files logic
@@ -127,7 +127,7 @@ func handleUploadFolder(p *pikpak.PikPak, path string) {
 		f = file
 		bs, err := ioutil.ReadAll(f)
 		if err != nil {
-			logrus.Error("read file error: ", err)
+			logrus.Errorln("read file error:", err)
 			os.Exit(1)
 		}
 		alreadySyncFiles := strings.Split(string(bs), "\n")
@@ -154,7 +154,7 @@ func handleUploadFolder(p *pikpak.PikPak, path string) {
 		}
 	}
 
-	logrus.Debug("upload folder: ", uploadFolder, " parentId: ", parentId)
+	logrus.Debugln("upload folder:", uploadFolder, "parentId:", parentId)
 
 	parentId, err = p.GetDeepFolderOrCreateId(parentId, basePath)
 	if err != nil {
@@ -185,7 +185,7 @@ func handleUploadFolder(p *pikpak.PikPak, path string) {
 			if sync {
 				f.WriteString(v + "\n")
 			}
-			logrus.Infof("%s upload success!\n", v)
+			logrus.Infof("%s upload success!", v)
 		} else {
 			err = p.UploadFile(parentId, filepath.Join(path, v))
 			if err != nil {

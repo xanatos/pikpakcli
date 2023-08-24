@@ -38,7 +38,7 @@ func handleNewFolder(p *pikpak.PikPak, folders []string) {
 	if parentId == "" {
 		parentId, err = p.GetPathFolderId(path)
 		if err != nil {
-			logrus.Errorf("Get parent id failed: %s\n", err)
+			logrus.Errorf("Get parent id failed: %s", err)
 			return
 		}
 	}
@@ -46,9 +46,9 @@ func handleNewFolder(p *pikpak.PikPak, folders []string) {
 	for _, folder := range folders {
 		_, err := p.CreateFolder(parentId, folder)
 		if err != nil {
-			logrus.Errorf("Create folder %s failed: %s\n", folder, err)
+			logrus.Errorf("Create folder %s failed: %s", folder, err)
 		} else {
-			logrus.Infof("Create folder %s success\n", folder)
+			logrus.Infof("Create folder %s success", folder)
 		}
 	}
 }

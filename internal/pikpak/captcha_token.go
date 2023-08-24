@@ -45,7 +45,7 @@ func (p *PikPak) AuthCaptchaToken(action string) error {
 			str = fmt.Sprintf("%x", md5.Sum([]byte(str+salt)))
 		}
 	}
-	// logrus.Debug("captcha_sign: ", "1."+str)
+	// logrus.Debugln("captcha_sign:", "1."+str)
 	m["meta"] = map[string]string{
 		"captcha_sign":   "1." + str,
 		"user_id":        p.Sub,

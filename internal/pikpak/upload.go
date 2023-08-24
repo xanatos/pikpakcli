@@ -101,11 +101,11 @@ START:
 	// logrus.Debug(string(bs))
 	file := jsoniter.Get(bs, "file")
 	phase := file.Get("phase").ToString()
-	logrus.Debug("path: ", path, " phase: ", phase)
+	logrus.Debugln("path:", path, "phase:", phase)
 
 	switch phase {
 	case "PHASE_TYPE_COMPLETE":
-		logrus.Debug(path, " upload file complete")
+		logrus.Debugln(path, "upload file complete")
 		return nil
 	case "PHASE_TYPE_PENDING":
 		// break switch
